@@ -1,4 +1,4 @@
-# Godot
+﻿# Godot
 .godot/
 .import/
 export.cfg
@@ -47,3 +47,11 @@ android/local.properties
 .DS_Store
 Thumbs.db
 desktop.ini
+/configs/AdMob.local.txt
+
+# Local verification/capture output
+tmp/
+/tmp/
+*.tmp
+changes.patch
+

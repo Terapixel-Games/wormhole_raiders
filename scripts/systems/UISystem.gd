@@ -43,9 +43,12 @@ func _ready() -> void:
     continue_btn.pressed.connect(_on_continue_pressed)
 
     if ad_manager != null:
-        ad_manager.rewarded_granted.connect(_on_rewarded_granted)
-        ad_manager.rewarded_failed.connect(_on_rewarded_failed)
-        ad_manager.rewarded_loaded.connect(_on_rewarded_loaded)
+        if ad_manager.has_signal("rewarded_granted"):
+            ad_manager.rewarded_granted.connect(_on_rewarded_granted)
+        if ad_manager.has_signal("rewarded_failed"):
+            ad_manager.rewarded_failed.connect(_on_rewarded_failed)
+        if ad_manager.has_signal("rewarded_loaded"):
+            ad_manager.rewarded_loaded.connect(_on_rewarded_loaded)
 
     if progression != null:
         _high_score = progression.get_high_score()
@@ -74,23 +77,23 @@ func _on_run_resumed() -> void:
 func _on_run_ended(reason: String) -> void:
     end_panel.visible = true
     end_reason.text = "Run Ended: %s" % reason
-    continue_btn.disabled = ad_manager == null or not ad_manager.is_rewarded_ready()
+    continue_btn.disabled = ad_manager == null or not ad_manager.has_method("is_rewarded_ready") or not ad_manager.is_rewarded_ready()
     _refresh_hud()
 
 func _on_restart_pressed() -> void:
-    if ad_manager != null:
+    if ad_manager != null and ad_manager.has_method("maybe_show_interstitial_after_run"):
         ad_manager.maybe_show_interstitial_after_run()
     run.start_run(run.get_next_seed())
 
 func _on_continue_pressed() -> void:
     continue_btn.disabled = true
-    if ad_manager != null:
+    if ad_manager != null and ad_manager.has_method("show_rewarded_for_continue"):
         ad_manager.show_rewarded_for_continue()
     else:
         _on_rewarded_failed()
 
 func _on_rewarded_granted() -> void:
-    if ad_manager != null:
+    if ad_manager != null and ad_manager.has_method("mark_rewarded_continue_used"):
         ad_manager.mark_rewarded_continue_used()
     run.continue_with_shield()
 
